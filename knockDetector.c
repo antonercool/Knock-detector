@@ -2,6 +2,7 @@
 #include "dev/button-sensor.h"
 #include "leds.h"
 #include "sys/log.h"
+#include "dynamic_Time_Warping.h"
 
 #define LOG_MODULE "Knock log"
 #define LOG_LEVEL LOG_LEVEL_DBG
@@ -191,9 +192,13 @@ PROCESS_THREAD(login_procees, ev, data)
       is_recording = false;
     }
   }
-
   LOG_DBG("Current login is : \n");
   log_login_sequence();
+
+  char** cost_matrix = compute_accumulated_cost_matrix(password_storage, login_password_storage);
+  
+  print_matrix(cost_matrix);
+  
     // alloc led indicator finnished
   end_login_recorder_event = process_alloc_event();
 
