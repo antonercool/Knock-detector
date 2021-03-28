@@ -25,6 +25,8 @@
 static process_event_t start_recording_event;
 static process_event_t end_recording_event;
 static process_event_t end_led_indicator_event;
+static process_event_t start_login_recorder_event;
+static process_event_t end_login_recorder_event;
 
 // LED pins
 static const leds_mask_t BLUE = 0x40;
@@ -35,7 +37,8 @@ static const leds_mask_t GREEN = 0x20;
 PROCESS(main_process, "main_process");
 PROCESS(record_password, "password recorder");
 PROCESS(led_start_up_indicater, "Led start up indicator");
-AUTOSTART_PROCESSES(&record_password, &main_process);
+PROCESS(login_procees, "login_procees");
+AUTOSTART_PROCESSES(&record_password, &main_process, &login_procees);
 /*---------------------------------------------------------------------------*/
 
 PROCESS_THREAD(main_process, ev, data)
@@ -51,13 +54,17 @@ PROCESS_THREAD(main_process, ev, data)
   start_recording_event = process_alloc_event();
   process_post(&record_password, start_recording_event, NULL);
   PROCESS_WAIT_EVENT_UNTIL(ev == end_recording_event);
+  LOG_DBG("Recording password ended \n");
 
   // login process incomming
+  start_login_recorder_event = process_alloc_event();
+  process_post(&login_procees, start_login_recorder_event, NULL);
+  PROCESS_WAIT_EVENT_UNTIL(ev == end_login_recorder_event);
+
   LOG_DBG("Main finish \n");
 
   PROCESS_END();
 }
-
 
 
 PROCESS_THREAD(led_start_up_indicater, ev, data)
@@ -105,7 +112,7 @@ PROCESS_THREAD(record_password, ev, data)
 { 
   // a simple timer, without built-in notification (caller must check if expired).
   static struct timer timer; 
-  bool is_recording = true;
+  static bool is_recording = true;
 
   PROCESS_BEGIN();
   LOG_DBG("Init record_password process \n");
@@ -124,8 +131,8 @@ PROCESS_THREAD(record_password, ev, data)
     {
       clock_time_t current_time = timer_remaining(&timer);
       printf("time left %u \n", (unsigned int)current_time);
-      add_press_within_timeslot(current_time);
-      LOG_DBG("Button press recorded \n");
+      record_secret_password_sequence(current_time);
+      LOG_DBG("Secret press : Button press recorded \n");
     }
     else
     {
@@ -137,7 +144,7 @@ PROCESS_THREAD(record_password, ev, data)
   leds_off(GREEN);
   LOG_DBG("Password was succesfully recorded \n");
   LOG_DBG("Current password is : \n");
-  log_password();
+  log_secret_password_sequence();
 
     // alloc led indicator finnished
   end_recording_event = process_alloc_event();
@@ -147,6 +154,56 @@ PROCESS_THREAD(record_password, ev, data)
 
   PROCESS_END();
 }
+
+
+PROCESS_THREAD(login_procees, ev, data)
+{
+// a simple timer, without built-in notification (caller must check if expired).
+  static struct timer timer; 
+  static bool is_recording = true;
+
+  PROCESS_BEGIN();
+  LOG_DBG("Init login recorder \n");
+
+  PROCESS_WAIT_EVENT_UNTIL(ev == start_login_recorder_event); 
+  LOG_DBG("Press button to start login sequence \n");
+  
+  SENSORS_ACTIVATE(button_sensor);
+  // press button to start login recording.
+  PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
+  leds_off(RED);
+  leds_on(BLUE);
+  // Start timer 10 sec
+  timer_set(&timer, CLOCK_SECOND*10);
+
+  while (is_recording == true)
+  {
+    PROCESS_WAIT_EVENT_UNTIL(ev == sensors_event && data == &button_sensor);
+    if(!timer_expired(&timer))
+    {
+      clock_time_t current_time = timer_remaining(&timer);
+      printf("time left %u \n", (unsigned int)current_time);
+      record_login_password_sequence(current_time);
+      LOG_DBG("Login press: Button press recorded \n");
+    }
+    else
+    {
+      is_recording = false;
+    }
+  }
+
+  LOG_DBG("Current login is : \n");
+  log_login_sequence();
+    // alloc led indicator finnished
+  end_login_recorder_event = process_alloc_event();
+
+  // send end_recording_event event to main
+  process_post(&main_process, end_login_recorder_event, NULL);
+
+  PROCESS_END();
+}
+
+
 /*---------------------------------------------------------------------------*/
 
 
