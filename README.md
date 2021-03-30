@@ -37,6 +37,7 @@ Each press gets stored within a time slot(128 ticks/1sec)   array of size [13]
 ### Log from program ### 
 Accetance threshold of min cost is set of 6. An acccetance lvl of 6 came from experiments
 
+```
 00:48.526	ID:1	[DBG : Knock     ] Current login is : 
 00:48.528	ID:1	1-1-0-0-0-0-0-0-0-0-0-0-0-
 00:48.587	ID:1	[DBG : Knock     ] printing dist matrix:
@@ -82,3 +83,4 @@ Accetance threshold of min cost is set of 6. An acccetance lvl of 6 came from ex
 00:48.725	ID:1	min cost : 0 
 00:48.728	ID:1	[DBG : Knock     ] Password is correct! 
 00:48.731	ID:1	[DBG : Knock     ] Main finish 
+```
