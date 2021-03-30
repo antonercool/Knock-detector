@@ -29,6 +29,17 @@ local sky build
 
 
 ## Password Recording ##
+*Secret password recording*
+* At program start a led indicater will blink 3 times.
+* When all Red,Green & Blue led is on the recording is active (10 sec)
+* After the recording period, the user ends with at button press.
+
+*login recording*
+* The mote will be locked, indicated by the Red led.
+* When the user presses a sequence of button clicks the Blue led will indicate (login recording)
+* If the password is acceptable with ACCEPT_THRESHOLD then the Green led will indicate succes
+* If not, the Red led with indicate locked, and the user is able to retry the login sequence
+
 For each password the user has 10 sec(1280 clock ticks) to input presses (Maximum 13 presses)
 Each press gets stored within a time slot(128 ticks/1sec)   array of size [13]
 [0-128, 128-256, 256-384, 384-512, 512-640, 640-768, 786-896, 896-1024, 1024-1152, 1152-1280]
