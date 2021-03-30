@@ -14,12 +14,61 @@ static char password_storage[SIZE];
 static char login_password_storage[SIZE];
 
 /*----------------------------Proto types....................................*/
-void record_secret_password_sequence(clock_time_t time_left);
-void log_secret_password_sequence();
-void record_login_password_sequence(clock_time_t time_left);
-void log_login_sequence();
-void clear_login_password_sequence();
 
+/*
+    Stores a secret button press within the correct timeslot
+
+    $$Params$$
+        clock_time_t : time left in ticks (1280 ticks = 10s)
+
+    $$return$$
+        void
+*/
+void record_secret_password_sequence(clock_time_t time_left);
+
+
+/*
+    Outputs the stored secret password
+
+    $$return$$
+        void
+*/
+void log_secret_password_sequence();
+
+
+/*
+    Stores a login button press within the correct timeslot
+
+    $$Params$$
+        clock_time_t : time left in ticks (1280 ticks = 10s)
+
+    $$return$$
+        void
+*/
+void record_login_password_sequence(clock_time_t time_left);
+
+
+/*
+    Outputs the stored login password
+
+    $$return$$
+        void
+*/
+void log_login_sequence();
+
+
+/*
+    clears in stored login cache
+
+    $$return$$
+        void
+*/
+void clear_login();
+
+
+/*------------IMPLEMENTATION START--------------*/
+/*------------IMPLEMENTATION START--------------*/
+/*------------IMPLEMENTATION START--------------*/
 void record_secret_password_sequence(clock_time_t time_remaining )
 {
   clock_time_t current_time = TICKS - time_remaining;
@@ -57,16 +106,6 @@ void record_login_password_sequence(clock_time_t time_remaining )
   login_password_storage[recording_index] = 1;
 }
 
-void clear_login_password_sequence()
-{
-  int i = 0;
-  while (i<SIZE)
-  {
-    login_password_storage[i] = 0;
-    i++;
-  }
-}
-
 void log_login_sequence()
 {
   int counter = 0;
@@ -86,4 +125,14 @@ void log_login_sequence()
     i++;
   }
   printf("\n");
+}
+
+void clear_login()
+{
+  int i = 0;
+  while(i<SIZE)
+  {
+    login_password_storage[i] = 0;
+    i++;
+  }
 }
