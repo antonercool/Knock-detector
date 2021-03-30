@@ -1,3 +1,4 @@
+## Knock Detector ##
 Knock detector program that utilizes dynamic time warping in order to compare to passwords recorded by a button on a telos b mote.
 
 ## Build commands ##
@@ -41,6 +42,7 @@ local sky build
 * If not, the Red led with indicate locked, and the user is able to retry the login sequence
 
 *storage logic*
+
 For each password the user has 10 sec(1280 clock ticks) to input presses (Maximum 13 presses)
 Each press gets stored within a time slot(128 ticks/1sec)   array of size [13]
 [0-128, 128-256, 256-384, 384-512, 512-640, 640-768, 786-896, 896-1024, 1024-1152, 1152-1280]
